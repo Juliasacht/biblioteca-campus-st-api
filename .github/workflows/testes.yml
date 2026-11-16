@@ -20,3 +20,21 @@ jobs:
           cache: maven
       - name: Compilar e testar
         run: ./mvnw --batch-mode verify
+      - name: Iniciar API e validar coleção Postman
+        run: |
+          java -jar target/biblioteca-campus-st-api-0.0.1-SNAPSHOT.jar > "$RUNNER_TEMP/biblioteca.log" 2>&1 &
+          API_PID=$!
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
+          PRONTO=false
+          for tentativa in {1..30}; do
+            if curl --fail --silent http://localhost:8080/livros > /dev/null; then
+              PRONTO=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$PRONTO" != true ]; then
+            cat "$RUNNER_TEMP/biblioteca.log"
+            exit 1
+          fi
+          npx --yes newman@6.2.1 run postman/biblioteca.postman_collection.json

@@ -1,0 +1,926 @@
+{
+  "info": {
+    "name": "Biblioteca do Campus - API REST",
+    "description": "Execute em ordem pelo Collection Runner, com a aplicação recém-iniciada e a carga inicial habilitada. A coleção altera dados e devolve o empréstimo inicial. Reinicie a aplicação antes de executar novamente. Inclui os 15 endpoints e respostas 200, 201, 204, 400, 404 e 409.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "livroId",
+      "value": ""
+    },
+    {
+      "key": "leitorId",
+      "value": ""
+    },
+    {
+      "key": "emprestimoId",
+      "value": ""
+    },
+    {
+      "key": "isbnTeste",
+      "value": ""
+    },
+    {
+      "key": "emailTeste",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.info.requestName === \"01 - Listar livros iniciais\") {",
+          "  const agora = Date.now().toString();",
+          "  pm.collectionVariables.set(\"isbnTeste\", agora.slice(-13).padStart(13, \"0\"));",
+          "  pm.collectionVariables.set(\"emailTeste\", \"teste.\" + agora + \"@campus.edu.br\");",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Listar livros iniciais",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/livros"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Filtrar livros por autor e disponibilidade",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/livros?autor=Martin&disponivel=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Consultar livro inicial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/livros/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Listar leitores",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/leitores"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Filtrar professores",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/leitores?tipo=PROFESSOR"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Consultar leitor inicial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/leitores/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Listar empréstimos ativos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos?leitorId=1&ativos=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Consultar empréstimo inicial",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Relatório de atrasados",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/atrasados"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Há um atraso inicial\", () => pm.expect(pm.response.json().length).to.be.at.least(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Erro 400: livro inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/livros",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"\",\n  \"autor\": \"\",\n  \"isbn\": \"abc\",\n  \"anoPublicacao\": 1400,\n  \"quantidadeTotal\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });",
+              "pm.test(\"Mapa de erros\", () => { pm.expect(pm.response.json().errors).to.have.property(\"isbn\"); pm.expect(pm.response.json().errors).to.have.property(\"quantidadeTotal\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Erro 400: e-mail inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leitores",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Teste\",\n  \"email\": \"invalido\",\n  \"tipo\": \"ALUNO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Erro 400: tipo inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leitores",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Teste\",\n  \"email\": \"teste@campus.edu.br\",\n  \"tipo\": \"DIRETOR\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Erro 400: empréstimo inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/emprestimos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"livroId\": 0,\n  \"leitorId\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Erro 404: livros",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/livros/99999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Erro 404: leitores",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/leitores/99999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Erro 404: emprestimos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/99999999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 - Erro 409: ISBN duplicado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/livros",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Duplicado\",\n  \"autor\": \"Teste\",\n  \"isbn\": \"9788576082675\",\n  \"anoPublicacao\": 2020,\n  \"quantidadeTotal\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 - Erro 409: e-mail duplicado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leitores",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Duplicado\",\n  \"email\": \"ANA@campus.edu.br\",\n  \"tipo\": \"ALUNO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 - Erro 409: leitor com atraso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/emprestimos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"livroId\": 2,\n  \"leitorId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 - Erro 409: excluir livro emprestado",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/livros/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 - Erro 409: excluir leitor com empréstimo",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/leitores/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 - Devolver empréstimo atrasado",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/1/devolucao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Multa inicial de três dias\", () => pm.expect(pm.response.json().multa).to.eql(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 - Erro 409: devolver novamente",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/1/devolucao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 - Cadastrar livro",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/livros",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Livro de testes\",\n  \"autor\": \"Autor de testes\",\n  \"isbn\": \"{{isbnTeste}}\",\n  \"anoPublicacao\": 2024,\n  \"quantidadeTotal\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+              "pm.test(\"Location presente\", () => pm.expect(pm.response.headers.get(\"Location\")).to.be.a(\"string\"));",
+              "pm.collectionVariables.set(\"livroId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 - Atualizar livro",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/livros/{{livroId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Livro atualizado\",\n  \"autor\": \"Autor de testes\",\n  \"isbn\": \"{{isbnTeste}}\",\n  \"anoPublicacao\": 2024,\n  \"quantidadeTotal\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "26 - Consultar livro cadastrado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/livros/{{livroId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "27 - Cadastrar leitor",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leitores",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Leitor de testes\",\n  \"email\": \"{{emailTeste}}\",\n  \"tipo\": \"ALUNO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+              "pm.test(\"Location presente\", () => pm.expect(pm.response.headers.get(\"Location\")).to.be.a(\"string\"));",
+              "pm.collectionVariables.set(\"leitorId\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "28 - Atualizar leitor",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/leitores/{{leitorId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Leitor atualizado\",\n  \"email\": \"{{emailTeste}}\",\n  \"tipo\": \"ALUNO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "29 - Consultar leitor cadastrado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/leitores/{{leitorId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30 - Realizar empréstimo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/emprestimos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"livroId\": {{livroId}},\n  \"leitorId\": {{leitorId}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+              "pm.test(\"Location presente\", () => pm.expect(pm.response.headers.get(\"Location\")).to.be.a(\"string\"));",
+              "pm.collectionVariables.set(\"emprestimoId\", pm.response.json().id);",
+              "pm.test(\"Resposta contém livro e leitor\", () => { pm.expect(pm.response.json().titulo).to.eql(\"Livro atualizado\"); pm.expect(pm.response.json().leitor).to.eql(\"Leitor atualizado\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "31 - Consultar empréstimo cadastrado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "32 - Listar empréstimos do leitor",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos?leitorId={{leitorId}}&ativos=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "33 - Devolver empréstimo no prazo",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}/devolucao"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Multa zero\", () => pm.expect(pm.response.json().multa).to.eql(0));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "34 - Excluir livro sem empréstimo ativo",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/livros/{{livroId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "35 - Excluir leitor sem empréstimo ativo",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/leitores/{{leitorId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "36 - Histórico preservado após exclusões",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
