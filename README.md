@@ -5,7 +5,7 @@
 Mini-projeto individual de Tópicos Especiais II — Programação Avançada (Java + Spring Boot).
 API para livros, leitores e empréstimos, com armazenamento em memória.
 
-**Integrante:** [@Juliasacht](https://github.com/Juliasacht). Completar nome acadêmico e matrícula antes da entrega.
+**Integrante:** [@Juliasacht](https://github.com/Juliasacht).
 
 ## Tecnologias
 
@@ -239,8 +239,4 @@ Para demonstrar: liste `/emprestimos/atrasados`; tente emprestar para o leitor 1
 devolva o empréstimo 1 (multa R$ 3,00); tente devolvê-lo novamente (409).
 Para desabilitar a carga inicial, use `biblioteca.carga-inicial: false`.
 
-## Entrega
 
-O repositório mantém commits por etapa, README, coleção do Postman e testes.
-Confira nome/matrícula, acesso do professor e eventuais instruções da seção 11 do enunciado.
-Para estudar e apresentar o código, consulte [docs/roteiro.md](docs/roteiro.md).
