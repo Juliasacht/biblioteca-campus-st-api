@@ -1,0 +1,42 @@
+name: Base Spring Initializr
+
+on:
+  push:
+    paths: ['.github/workflows/base-inicial.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gerar-base:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter base oficial
+        run: |
+          curl --fail --silent --show-error --retry 3 --get https://start.spring.io/starter.zip \
+            --data-urlencode type=maven-project \
+            --data-urlencode language=java \
+            --data-urlencode bootVersion=4.0.9 \
+            --data-urlencode groupId=br.edu.campus \
+            --data-urlencode artifactId=biblioteca-campus-st-api \
+            --data-urlencode name=Biblioteca \
+            --data-urlencode description="API REST de empréstimos da biblioteca do campus" \
+            --data-urlencode packageName=br.edu.campus.biblioteca \
+            --data-urlencode packaging=jar \
+            --data-urlencode javaVersion=21 \
+            --data-urlencode dependencies=web,validation \
+            --output "$RUNNER_TEMP/base.zip"
+      - name: Exibir arquivos gerados para conferência
+        run: |
+          python3 - <<'PY'
+          import os, zipfile, json, base64
+          paths = ['pom.xml', 'mvnw', 'mvnw.cmd', '.mvn/wrapper/maven-wrapper.properties', 'src/main/java/br/edu/campus/biblioteca/BibliotecaApplication.java']
+          with zipfile.ZipFile(os.path.join(os.environ['RUNNER_TEMP'], 'base.zip')) as z:
+              files = {p: z.read(p).decode('utf-8') for p in paths}
+          print('INITIALIZR_FILES_B64=' + base64.b64encode(json.dumps(files).encode()).decode())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: base-spring-initializr
+          path: ${{ runner.temp }}/base.zip
