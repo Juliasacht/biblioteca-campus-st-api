@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class EmprestimoRepositoryMemoria extends RepositoryMemoria<Emprestimo> implements EmprestimoRepository {
     public EmprestimoRepositoryMemoria() {
-        super(Emprestimo::id, (id, e) -> new Emprestimo(id, e.livroId(), e.leitorId(), e.dataEmprestimo(), e.dataPrevistaDevolucao(), e.dataDevolucao(), e.multa()));
+        super(Emprestimo::id, (id, e) -> new Emprestimo(id, e.livroId(), e.leitorId(),
+                e.titulo(), e.leitor(), e.dataEmprestimo(), e.dataPrevistaDevolucao(),
+                e.dataDevolucao(), e.multa()));
     }
 }
