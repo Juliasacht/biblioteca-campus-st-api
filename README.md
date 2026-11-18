@@ -5,7 +5,7 @@
 Mini-projeto individual de Tópicos Especiais II — Programação Avançada (Java + Spring Boot).
 API para livros, leitores e empréstimos, com armazenamento em memória.
 
-**Integrante:** [@Juliasacht](https://github.com/Juliasacht).
+**Integrante:** Julia de Souza Sacht — [@Juliasacht](https://github.com/Juliasacht).
 
 ## Tecnologias
 
@@ -55,7 +55,7 @@ Linux/macOS:
 ./mvnw verify
 ```
 
-Os 17 testes automatizados verificam RN01–RN10, CRUD, filtros, validações, status HTTP, Location,
+Os 19 testes automatizados verificam RN01–RN10, CRUD, filtros, validações, status HTTP, Location,
 estoque, multas, prazos e preservação do histórico. O relógio é fixo nos testes.
 A carga inicial é desabilitada durante os testes HTTP; cada teste limpa seu estado.
 
@@ -183,7 +183,7 @@ Exemplo de validação:
   "status": 400,
   "detail": "Um ou mais campos estão inválidos",
   "instance": "/livros",
-  "errors": {
+  "erros": {
     "isbn": "O ISBN deve ter 13 dígitos"
   }
 }
@@ -215,8 +215,10 @@ Exemplo de validação:
 - `ControleAcervo` serializa operações compostas na aplicação em memória, evitando que
   requisições simultâneas ultrapassem estoque ou limites.
 - Não é permitido reduzir quantidade total abaixo dos empréstimos ativos (409).
-- Para manter a política de empréstimos ativos, a troca de tipo do leitor é bloqueada
-  enquanto houver empréstimos ativos (409).
+- O tipo do leitor pode ser atualizado, desde que a quantidade de empréstimos ativos
+  respeite o limite da nova política (409 se excedido).
+- Cada empréstimo preserva o tipo do leitor na contratação. Atualizar o cadastro não
+  altera o prazo nem a política de multa dos empréstimos já realizados.
 - Título e nome são registrados no empréstimo como fotografia do momento da operação.
   O histórico continua legível após exclusões permitidas de livros/leitores.
 - Os dados não são persistidos: reiniciar apaga as alterações e recria a carga inicial.

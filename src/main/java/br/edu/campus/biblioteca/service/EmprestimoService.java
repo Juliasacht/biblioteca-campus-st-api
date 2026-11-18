@@ -62,7 +62,7 @@ public class EmprestimoService {
                     && e.dataPrevistaDevolucao().isBefore(hoje))) {
                 throw new RegraNegocioException("Leitor com empréstimo atrasado não pode fazer novo empréstimo");
             }
-            Emprestimo novo = new Emprestimo(null, livro.id(), leitor.id(), livro.titulo(), leitor.nome(),
+            Emprestimo novo = new Emprestimo(null, livro.id(), leitor.id(), livro.titulo(), leitor.nome(), leitor.tipo(),
                     hoje, hoje.plusDays(politica.prazoEmDias()), null, new BigDecimal("0.00"));
             return resposta(emprestimos.save(novo));
         });
@@ -85,13 +85,11 @@ public class EmprestimoService {
             if (!atual.ativo()) {
                 throw new RegraNegocioException("Empréstimo já devolvido");
             }
-            Leitor leitor = leitores.findById(atual.leitorId()).orElseThrow(() ->
-                    new RecursoNaoEncontradoException("Leitor do empréstimo não encontrado"));
             LocalDate hoje = LocalDate.now(clock);
             long diasAtraso = Math.max(0, ChronoUnit.DAYS.between(atual.dataPrevistaDevolucao(), hoje));
-            BigDecimal multa = politicas.get(leitor.tipo()).calcularMulta(diasAtraso);
+            BigDecimal multa = politicas.get(atual.tipoLeitorNaContratacao()).calcularMulta(diasAtraso);
             Emprestimo devolvido = new Emprestimo(atual.id(), atual.livroId(), atual.leitorId(),
-                    atual.titulo(), atual.leitor(), atual.dataEmprestimo(),
+                    atual.titulo(), atual.leitor(), atual.tipoLeitorNaContratacao(), atual.dataEmprestimo(),
                     atual.dataPrevistaDevolucao(), hoje, multa);
             return resposta(emprestimos.save(devolvido));
         });

@@ -43,7 +43,7 @@ public class CargaInicial implements CommandLineRunner {
                 .findFirst().orElseThrow().prazoEmDias();
         LocalDate vencimento = LocalDate.now(clock).minusDays(3);
         // Inserção direta é intencional: permite demonstrar atraso sem aguardar dias.
-        emprestimos.save(new Emprestimo(null, livro.id(), aluno.id(), livro.titulo(), aluno.nome(),
+        emprestimos.save(new Emprestimo(null, livro.id(), aluno.id(), livro.titulo(), aluno.nome(), aluno.tipo(),
                 vencimento.minusDays(prazo), vencimento, null, new BigDecimal("0.00")));
     }
 }

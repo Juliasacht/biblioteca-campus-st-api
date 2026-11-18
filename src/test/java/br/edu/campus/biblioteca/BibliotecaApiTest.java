@@ -218,8 +218,8 @@ class BibliotecaApiTest {
         var r = enviar("POST", "/livros", "{\"titulo\":\"\",\"autor\":\"\",\"isbn\":\"abc\",\"anoPublicacao\":1400,\"quantidadeTotal\":0}");
         assertEquals(400, r.statusCode());
         assertTrue(r.headers().firstValue("Content-Type").orElseThrow().contains("application/problem+json"));
-        assertNotNull(campo(r, "$.errors.isbn"));
-        assertNotNull(campo(r, "$.errors.quantidadeTotal"));
+        assertNotNull(campo(r, "$.erros.isbn"));
+        assertNotNull(campo(r, "$.erros.quantidadeTotal"));
         assertEquals(400, enviar("POST", "/leitores", leitorJson("invalido", "ALUNO")).statusCode());
         assertEquals(400, enviar("POST", "/leitores", leitorJson("a@b.com", "DIRETOR")).statusCode());
         assertEquals(400, enviar("POST", "/emprestimos", "{\"livroId\":0}").statusCode());
@@ -230,13 +230,50 @@ class BibliotecaApiTest {
     }
 
     @Test
-    void atualizacaoNaoReduzEstoqueAbaixoDosAtivosNemTrocaTipoAtivo() throws Exception {
+    void atualizacaoNaoReduzEstoqueAbaixoDosAtivos() throws Exception {
         Livro l = livro(4);
         Leitor a = leitor(TipoLeitor.ALUNO);
         emprestar(l, a);
         emprestar(l, a);
         conflito(enviar("PUT", "/livros/" + l.id(), livroJson(l.isbn(), 1)));
-        conflito(enviar("PUT", "/leitores/" + a.id(), leitorJson(a.email(), "PROFESSOR")));
+    }
+
+
+    @Test
+    void trocaDeTipoPreservaPrazoEMultaDaContratacao() throws Exception {
+        Livro l = livro(10);
+        for (TipoLeitor original : TipoLeitor.values()) {
+            Leitor a = leitor(original);
+            Emprestimo antigo = historico(l, a, HOJE.minusDays(3), null);
+            TipoLeitor novoTipo = original == TipoLeitor.ALUNO ? TipoLeitor.PROFESSOR : TipoLeitor.ALUNO;
+
+            var atualizado = enviar("PUT", "/leitores/" + a.id(), leitorJson(a.email(), novoTipo.name()));
+            assertEquals(200, atualizado.statusCode());
+            assertEquals(novoTipo.name(), campo(atualizado, "$.tipo"));
+            var consulta = enviar("GET", "/emprestimos/" + antigo.id(), null);
+            assertEquals(antigo.dataPrevistaDevolucao().toString(), campo(consulta, "$.dataPrevistaDevolucao"));
+
+            var devolucao = enviar("POST", "/emprestimos/" + antigo.id() + "/devolucao", null);
+            assertEquals(200, devolucao.statusCode());
+            double multaEsperada = original == TipoLeitor.ALUNO ? 3.0 : 1.5;
+            assertEquals(multaEsperada, ((Number) campo(devolucao, "$.multa")).doubleValue());
+
+            var novo = emprestar(l, a);
+            assertEquals(201, novo.statusCode());
+            int novoPrazo = novoTipo == TipoLeitor.ALUNO ? 7 : 14;
+            assertEquals(HOJE.plusDays(novoPrazo).toString(), campo(novo, "$.dataPrevistaDevolucao"));
+        }
+    }
+
+    @Test
+    void trocaDeTipoRespeitaLimiteDaNovaPolitica() throws Exception {
+        Livro l = livro(10);
+        Leitor a = leitor(TipoLeitor.PROFESSOR);
+        for (int i = 0; i < 4; i++) {
+            assertEquals(201, emprestar(l, a).statusCode());
+        }
+        conflito(enviar("PUT", "/leitores/" + a.id(), leitorJson(a.email(), "ALUNO")));
+        assertEquals("PROFESSOR", campo(enviar("GET", "/leitores/" + a.id(), null), "$.tipo"));
     }
 
     private void verificarLimite(TipoLeitor tipo, int limite) throws Exception {
@@ -257,7 +294,7 @@ class BibliotecaApiTest {
     }
 
     private Emprestimo historico(Livro l, Leitor a, LocalDate prazo, LocalDate devolucao) {
-        return emprestimos.save(new Emprestimo(null, l.id(), a.id(), l.titulo(), a.nome(),
+        return emprestimos.save(new Emprestimo(null, l.id(), a.id(), l.titulo(), a.nome(), a.tipo(),
                 prazo.minusDays(14), prazo, devolucao, new BigDecimal("0.00")));
     }
 

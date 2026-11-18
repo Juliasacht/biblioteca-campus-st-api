@@ -247,7 +247,7 @@
             "exec": [
               "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
               "pm.test(\"Formato ProblemDetail\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); pm.expect(pm.response.json().status).to.eql(pm.response.code); });",
-              "pm.test(\"Mapa de erros\", () => { pm.expect(pm.response.json().errors).to.have.property(\"isbn\"); pm.expect(pm.response.json().errors).to.have.property(\"quantidadeTotal\"); });"
+              "pm.test(\"Mapa de erros\", () => { pm.expect(pm.response.json().erros).to.have.property(\"isbn\"); pm.expect(pm.response.json().erros).to.have.property(\"quantidadeTotal\"); });"
             ]
           }
         }

@@ -4,9 +4,13 @@ import br.edu.campus.biblioteca.dto.*;
 import br.edu.campus.biblioteca.exception.*;
 import br.edu.campus.biblioteca.model.*;
 import br.edu.campus.biblioteca.repository.*;
+import br.edu.campus.biblioteca.service.politica.PoliticaEmprestimo;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,11 +18,15 @@ public class LeitorService {
     private final LeitorRepository leitores;
     private final EmprestimoRepository emprestimos;
     private final ControleAcervo controle;
+    private final Map<TipoLeitor, PoliticaEmprestimo> politicas;
 
-    public LeitorService(LeitorRepository leitores, EmprestimoRepository emprestimos, ControleAcervo controle) {
+    public LeitorService(LeitorRepository leitores, EmprestimoRepository emprestimos,
+            ControleAcervo controle, List<PoliticaEmprestimo> politicas) {
         this.leitores = leitores;
         this.emprestimos = emprestimos;
         this.controle = controle;
+        this.politicas = politicas.stream()
+                .collect(Collectors.toUnmodifiableMap(PoliticaEmprestimo::tipo, Function.identity()));
     }
 
     public LeitorResponse criar(LeitorRequest entrada) {
@@ -39,10 +47,12 @@ public class LeitorService {
 
     public LeitorResponse atualizar(Long id, LeitorRequest entrada) {
         return controle.executar(() -> {
-            Leitor atual = encontrar(id);
+            encontrar(id);
             validarEmail(entrada.email(), id);
-            if (atual.tipo() != entrada.tipo() && temAtivos(id)) {
-                throw new RegraNegocioException("O tipo do leitor não pode mudar enquanto houver empréstimos ativos");
+            long quantidadeAtiva = emprestimos.findAll().stream()
+                    .filter(e -> e.ativo() && e.leitorId().equals(id)).count();
+            if (quantidadeAtiva > politicas.get(entrada.tipo()).limiteEmprestimos()) {
+                throw new RegraNegocioException("A quantidade de empréstimos ativos excede o limite da política informada");
             }
             return resposta(leitores.save(modelo(id, entrada)));
         });

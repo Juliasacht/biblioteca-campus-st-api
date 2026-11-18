@@ -61,7 +61,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         detalhe.setTitle(titulo);
         detalhe.setInstance(URI.create(((ServletWebRequest) request).getRequest().getRequestURI()));
         if (erros != null) {
-            detalhe.setProperty("errors", erros);
+            detalhe.setProperty("erros", erros);
         }
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_PROBLEM_JSON).body(detalhe);
     }
